@@ -1,5 +1,9 @@
 LaguerreCSharp/bin
 LaguerreCSharp/obj
 LaguerreTests/bin
+<<<<<<< HEAD
 LaguerreTests/obj
 .vs
+=======
+LaguerreTests/obj
+>>>>>>> f489a377481a742be46a88780f1d48c243ddcd81
