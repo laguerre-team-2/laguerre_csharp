@@ -104,7 +104,7 @@ public class LaguerreFunctionTests : IClassFixture<AllData>
         fixture = allData;
     }
 
-    [Fact]
+    [Fact] //Theory
     public void LaguerreFunction_ValidInput_ReturnsExpectedResult()
     {
         var laguerre = fixture.Laguerres[0];
@@ -212,6 +212,22 @@ public class LaguerreTabulatorTests : IClassFixture<AllData>
         Assert.NotNull(result.t);
         Assert.NotNull(result.l);
         Assert.Equal(result.t.Length, result.l.Length);
+    }
+
+}
+public class ServiceTests : IClassFixture<AllData>
+{
+    private readonly AllData fixture;
+
+    public ServiceTests(AllData allData)
+    {
+        fixture = allData;
+    }
+
+    [Fact]
+    public void IntegrationTest()
+    {
+        Assert.Equal(2.66667, Service.Integrate((x) => Math.Pow(x, 2), 0, 2), 5);
     }
 
 }
