@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaguerreCSharp", "LaguerreCSharp\LaguerreCSharp.csproj", "{A37E914A-50B3-4FB3-800B-F98BDD4A395A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaguerreTests", "LaguerreTests\LaguerreTests.csproj", "{E4044199-DE36-4C02-846A-17ACE2E937BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A37E914A-50B3-4FB3-800B-F98BDD4A395A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A37E914A-50B3-4FB3-800B-F98BDD4A395A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A37E914A-50B3-4FB3-800B-F98BDD4A395A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A37E914A-50B3-4FB3-800B-F98BDD4A395A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4044199-DE36-4C02-846A-17ACE2E937BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4044199-DE36-4C02-846A-17ACE2E937BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4044199-DE36-4C02-846A-17ACE2E937BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4044199-DE36-4C02-846A-17ACE2E937BE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {16DD7954-0302-4573-8AC5-7298161F5D30}
+	EndGlobalSection
+EndGlobal

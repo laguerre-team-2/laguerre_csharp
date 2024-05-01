@@ -1,24 +1,12 @@
-﻿using System;
+﻿double l = 1;
+double mu = l * 3;
+double GaussianNormalDistribution(double t) => 1 / (l * Math.Sqrt(2 * Math.PI)) * Math.Exp(-Math.Pow(t - mu, 2) / 2 * Math.Pow(l, 2));
 
-for (int i = 1; i < 5; i++)
+LaguerreTabulator Instance = new(GaussianNormalDistribution, 10000, 2, 4, 15, 0.001);
+(int[] a, double[] b) = Instance.TabulateLaguerreTransformation();
+for (int n = 0; n < a.Length; n++)
 {
-    for (int j = i; j < 5; j++)
-    {
-        for (double u = 3; u <= 6; u += 3)
-        {
-            double l = 1;
-            double mu = l * u;
-            double GaussianNormalDistribution(double t) => 1 / (l * Math.Sqrt(2 * Math.PI)) * Math.Exp(-Math.Pow(t - mu, 2) / 2 * Math.Pow(l, 2));
-
-            LaguerreTabulator Instance = new(GaussianNormalDistribution, 10000, i, j, 15, 0.001);
-            (int[] a, double[] b) = Instance.TabulateLaguerreTransformation();
-            for (int n = 0; n < a.Length; n++)
-            {
-                Console.WriteLine($"For lambda={l} u={mu} beta={i} and sigma={j} Transformation value: n={a[n]} transformed=P{b[n]}");
-            }
-
-        }
-    }
+    Console.WriteLine($"For lambda={l} u={mu} beta=2 and sigma=4 Transformation value: n={a[n]} transformed=P{b[n]}");
 }
 
 
