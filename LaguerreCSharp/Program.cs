@@ -1,293 +1,118 @@
-﻿double l = 1;
-double mu = l * 3;
-double GaussianNormalDistribution(double t) => 1 / (l * Math.Sqrt(2 * Math.PI)) * Math.Exp(-Math.Pow(t - mu, 2) / 2 * Math.Pow(l, 2));
+﻿using LaguerreClasses;
 
-LaguerreTabulator Instance = new(GaussianNormalDistribution, 10000, 2, 4, 15, 0.001);
-(int[] a, double[] b) = Instance.TabulateLaguerreTransformation();
-for (int n = 0; n < a.Length; n++)
+// double l = 1;
+// double mu = l * 3;
+// double GaussianNormalDistribution(double t) => 1 / (l * Math.Sqrt(2 * Math.PI)) * Math.Exp(-Math.Pow(t - mu, 2) / 2 * Math.Pow(l, 2));
+
+// LaguerreTabulator Instance = new(GaussianNormalDistribution, 10000, 2, 4, 15, 0.001);
+// (int[] a, double[] b) = Instance.TabulateLaguerreTransformation();
+// for (int n = 0; n < a.Length; n++)
+// {
+//     Console.WriteLine($"For lambda={l} u={mu} beta=2 and sigma=4 Transformation value: n={a[n]} transformed=P{b[n]}");
+// }
+
+static double func(double x) => 1 / (x + 1);
+LaguerreTabulator Instance = new(func, 100, 2, 4, 10, 0.001);
+var tabulatedExperimentData = Instance.TabulateExperiment();
+using (StreamWriter writetext = new("data/tabulatedExperiment.csv"))
 {
-    Console.WriteLine($"For lambda={l} u={mu} beta=2 and sigma=4 Transformation value: n={a[n]} transformed=P{b[n]}");
+    writetext.WriteLine("t,n,L(t)");
+    foreach (var value in tabulatedExperimentData)
+        writetext.WriteLine($"{value.Item1},{value.Item2},{value.Item3}");
 }
 
-
-public static class Service
+var tabulateLaguerreTransformation = Instance.TabulateLaguerreTransformation();
+using (StreamWriter writetext = new("data/tabulateLaguerreTransformation.csv"))
 {
-    public static double Integrate(Func<double, double> f, double a, double b, double margin = 0.001)
-    {
-        if (a > b)
-            throw new ArgumentException("Left bound must be lower than right bound.");
-
-        double area = 0;
-        while (Math.Abs(b - a) > margin)
-        {
-            area += margin * f(a + margin / 2);
-            a += margin;
-        }
-        return area;
-    }
+    writetext.WriteLine("x,t");
+    foreach (var value in tabulateLaguerreTransformation)
+        writetext.WriteLine($"{value.Item1},{value.Item2}");
 }
 
-public class Laguerre
+using (StreamWriter writetext = new("data/lauguerreFuncData.csv"))
 {
-    private Func<double, double> _func;
-    private double _T;
-    private int _beta;
-    private int _sigma;
-    private int _N;
-    private double _epsilon;
-    private double[]? _laguerreTransformationValue;
-    private double? _experimentValue;
-
-    public Laguerre(Func<double, double> func, double T, int beta, int sigma, int N, double epsilon = 1e-3)
+    int N = 20;
+    int a = 3;
+    writetext.Write("x");
+    for (int i = 0; i < N; i++)
     {
-        if (beta > sigma)
-            throw new ArgumentException("Sigma must be greater than beta.");
-
-        _func = func;
-        this.T = T;
-        this.Beta = beta;
-        this.Sigma = sigma;
-        this.N = N;
-        this.Epsilon = epsilon;
+        writetext.Write($",L_{i}");
     }
-
-    public Func<double, double> Func
+    writetext.WriteLine();
+    foreach (double x in Service.GenerateLinspace(0, a, 1000 * (a - 1)))
     {
-        get => _func;
-        set => Console.WriteLine("This is a read-only value.");
-    }
-
-    public double[] LaguerreTransformationValue
-    {
-        get
+        writetext.Write($"{x}");
+        for (int n = 0; n < N; n++)
         {
-            if (_laguerreTransformationValue is null)
-                _laguerreTransformationValue = LaguerreTransformation();
-            return _laguerreTransformationValue;
+            writetext.Write($",{Instance.LaguerreFunction(x, n)}");
         }
-        set => Console.WriteLine("This is a read-only value.");
-    }
-
-    public double ExperimentValue
-    {
-        get
-        {
-            if (_experimentValue is null)
-                _experimentValue = Experiment();
-            return _experimentValue.Value;
-        }
-        set => Console.WriteLine("This is a read-only value.");
-    }
-
-    public double T
-    {
-        get => _T;
-        set
-        {
-            if (value <= 0)
-                throw new ArgumentException("T must be positive.");
-            Reset();
-            _T = value;
-        }
-    }
-
-    public int Beta
-    {
-        get => _beta;
-        set
-        {
-            if (value < 0)
-                throw new ArgumentException("Beta must be non-negative.");
-            Reset();
-            _beta = value;
-        }
-    }
-
-    public int Sigma
-    {
-        get => _sigma;
-        set
-        {
-            if (value < 0)
-                throw new ArgumentException("Sigma must be non-negative.");
-            Reset();
-            _sigma = value;
-        }
-    }
-
-    public int N
-    {
-        get => _N;
-        set
-        {
-            if (value < 1)
-                throw new ArgumentException("N must be at least 1.");
-            Reset();
-            _N = value;
-        }
-    }
-
-    public double Epsilon
-    {
-        get => _epsilon;
-        set
-        {
-            if (value <= 0)
-                throw new ArgumentException("Epsilon must be positive.");
-            Reset();
-            _epsilon = value;
-        }
-    }
-
-    private void Reset()
-    {
-        _experimentValue = null;
-        _laguerreTransformationValue = null;
-    }
-
-    public double LaguerreFunction(double t, int n)
-    {
-        if (_beta < 0 || _beta > _sigma || n < 0)
-            throw new ArgumentException("Wrong parameters.");
-
-        double lpp = Math.Sqrt(_sigma) * Math.Exp(-_beta * t / 2);
-        double lp = Math.Sqrt(_sigma) * (1 - _sigma * t) * Math.Exp(-_beta * t / 2);
-
-        if (n == 0)
-            return lpp;
-        if (n == 1)
-            return lp;
-
-        for (int i = 2; i <= n; i++)
-        {
-            double temp = lp;
-            lp = ((2 * i - 1 - _sigma * t) * lp / i) - ((i - 1) * lpp / i);
-            lpp = temp;
-        }
-
-        return lp;
-    }
-
-    public double Experiment()
-    {
-        double[] t = GenerateLinspace(0, T, 1000);
-        bool trueForAll;
-        double result = 0;
-
-        for (int i = 0; i < t.Length; i++)
-        {
-            trueForAll = true;
-            for (int j = 0; j <= N; j++)
-            {
-                if (Math.Abs(LaguerreFunction(t[i], j)) >= Epsilon)
-                {
-                    trueForAll = false;
-                    break;
-                }
-            }
-
-            if (trueForAll)
-            {
-                result = t[i];
-                break;
-            }
-        }
-
-        if (result == 0)
-            throw new Exception("The experiment failed, there is no T that satisfies the condition. You can set a bigger max T to check.");
-
-        _experimentValue = result;
-        return result;
-    }
-
-    public double[] LaguerreTransformation()
-    {
-        double to = ExperimentValue;
-        double[] result = new double[N + 1];
-
-        for (int k = 0; k <= N; k++)
-        {
-            result[k] = Service.Integrate(t => _func(t) * LaguerreFunction(t, k) * Math.Exp(-t * (_sigma - _beta)), 0, to, Epsilon);
-        }
-
-        _laguerreTransformationValue = result;
-        return result;
-    }
-
-    public double ReverseLaguerreTransformation(double t)
-    {
-        double sum = 0;
-        for (int k = 0; k < N; k++)
-        {
-            sum += LaguerreTransformationValue[k] * LaguerreFunction(t, k);
-        }
-        return sum;
-    }
-
-    public static double[] GenerateLinspace(double start, double stop, int num)
-    {
-        double[] linspace = new double[num];
-        double step = (stop - start) / (num - 1);
-
-        for (int i = 0; i < num; i++)
-        {
-            linspace[i] = start + i * step;
-        }
-
-        return linspace;
+        writetext.WriteLine();
     }
 }
 
-public class LaguerreTabulator : Laguerre
+static double funcSonya(double t)
 {
-    public LaguerreTabulator(Func<double, double> func, double T, int beta, int sigma, int N, double epsilon)
-        : base(func, T, beta, sigma, N, epsilon)
+    if (t != 0)
+        return Math.Sin(Math.PI / 3) - Math.Atan(t + t / 2) / t;
+    else
+        return 0;
+}
+
+static double funcDemian(double t)
+{
+    return 2 * (Math.PI / 2 - Math.Atan(t + Math.PI / 6));
+}
+
+static double funcIvan(double t)
+{
+    if (t >= 0 && t <= 2 * Math.PI)
+        return Math.PI / 3 - Math.Sin(t + 3 * Math.PI / 2);
+    else
+        return 0;
+}
+
+static double funcStefa(double t)
+{
+    if (t >= 0 && t <= 2 * Math.PI)
+        return -1d / 200d * Math.Sin(t) * Math.Pow(Math.E, t);
+    else
+        return 0;
+}
+
+static double funcYuliia(double t)
+{
+    return Math.Cos(t) / Math.Pow(t, t);
+}
+List<(string, Laguerre)> laguerres =
+[
+    new("funcSonya", new Laguerre(funcSonya, 100, 2, 4, 10)),
+    new("funcDemian", new Laguerre(funcDemian, 100, 2, 4, 10)),
+    new("funcIvan", new Laguerre(funcIvan, 100, 2, 4, 10)),
+    new("funcStefa", new Laguerre(funcStefa, 100, 2, 4, 10)),
+    new("funcYuliia", new Laguerre(funcYuliia, 100, 2, 4, 10)),
+];
+
+using (StreamWriter writetext = new("data/reverseTransformationData.csv"))
+{
+    int N = 20;
+    int a = 6;
+    writetext.Write("x");
+    foreach (var item in laguerres)
     {
-        if (beta > sigma)
-            throw new ArgumentException("Sigma must be greater than beta.");
+        writetext.Write($",{item.Item1},{item.Item1}_transformed");
     }
+    for (int i = 0; i < N; i++) { }
+    writetext.WriteLine();
 
-    public (double[] t, double[] l) TabulateLaguerre(int n, double to)
+    foreach (double x in Service.GenerateLinspace(1, a, 100 * (a - 1)))
     {
-        double[] t = GenerateLinspace(1, to, (int)to);
-        double[] results = new double[t.Length];
-
-        for (int i = 0; i < t.Length; i++)
+        writetext.Write($"{x}");
+        foreach (var laguerre in laguerres)
         {
-            results[i] = LaguerreFunction(t[i], n);
+            writetext.Write(
+                $",{laguerre.Item2.Func(x)},{laguerre.Item2.ReverseLaguerreTransformation(x)}"
+            );
         }
-
-        return (t, results);
-    }
-
-    public (double[] t, int[] n, double[] L) TabulateExperiment()
-    {
-        double t = ExperimentValue;
-        double[] ltValues = new double[N + 1];
-        for (int n = 0; n <= N; n++)
-        {
-            ltValues[n] = LaguerreFunction(t, n);
-        }
-
-        double[] t_array = new double[N + 1];
-        int[] n_array = new int[N + 1];
-        for (int i = 0; i <= N; i++)
-        {
-            t_array[i] = t; n_array[i] = i;
-        }
-
-        return (t_array, n_array, ltValues);
-    }
-
-    public (int[] n, double[] transformed) TabulateLaguerreTransformation()
-    {
-        double[] transformed = LaguerreTransformationValue;
-        int[] n = new int[N + 1];
-        for (int i = 0; i <= N; i++)
-        {
-            n[i] = i;
-        }
-
-        return (n, transformed);
+        writetext.WriteLine();
     }
 }
