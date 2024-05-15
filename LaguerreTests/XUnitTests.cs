@@ -208,7 +208,7 @@ public class ServiceTests : IClassFixture<AllData>
     }
 
     [Theory]
-    [InlineData(0, 2, Math.PI / 2)]
+    [InlineData(0, 2, 1.41615)]
     [InlineData(1, 4, 1.19395)]
     public void IntegrationTest_SinFunction(double a, double b, double expected)
     {
