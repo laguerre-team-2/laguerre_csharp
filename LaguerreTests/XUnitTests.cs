@@ -104,13 +104,11 @@ public class LaguerreFunctionTests : IClassFixture<AllData>
         fixture = allData;
     }
 
-    [Fact] //Theory
-    public void LaguerreFunction_ValidInput_ReturnsExpectedResult()
+    [Theory]
+    [InlineData(5, 2, 3.97002)]
+    public void LaguerreFunction_ValidInput_ReturnsExpectedResult(double t, int n, double expected)
     {
         var laguerre = fixture.Laguerres[0];
-        double t = 5;
-        int n = 2;
-        double expected = 3.97002;
         double result = laguerre.LaguerreFunction(t, n);
         Assert.Equal(expected, result, 5);
     }
@@ -153,47 +151,18 @@ public class LaguerreTransformationTests : IClassFixture<AllData>
         fixture = allData;
     }
 
-    [Fact]
-    public void LaguerreTransformationStefaniaFuncTest()
+    [Theory]
+    [InlineData(4, -0.001999)]
+    [InlineData(1, -0.33491)]
+    [InlineData(2, 1.18473)]
+    [InlineData(3, 1.29813)]
+    [InlineData(5, 0.77927)]
+    public void LaguerreTransformation_ValidInput_ReturnsExpectedResult(
+        int laguerreIndex,
+        double expected
+    )
     {
-        var laguerre = fixture.Laguerres[4];
-        double expected = -0.001999;
-        double[] result = laguerre.LaguerreTransformationValue;
-        Assert.Equal(expected, result[0], 5);
-    }
-
-    [Fact]
-    public void LaguerreTransformationSonyaFuncTest()
-    {
-        var laguerre = fixture.Laguerres[1];
-        double expected = -0.33491;
-        double[] result = laguerre.LaguerreTransformationValue;
-        Assert.Equal(expected, result[0], 5);
-    }
-
-    [Fact]
-    public void LaguerreTransformationDemianFuncTest()
-    {
-        var laguerre = fixture.Laguerres[2];
-        double expected = 1.18473;
-        double[] result = laguerre.LaguerreTransformationValue;
-        Assert.Equal(expected, result[0], 5);
-    }
-
-    [Fact]
-    public void LaguerreTransformationIvanFuncTest()
-    {
-        var laguerre = fixture.Laguerres[3];
-        double expected = 1.29813;
-        double[] result = laguerre.LaguerreTransformationValue;
-        Assert.Equal(expected, result[0], 5);
-    }
-
-    [Fact]
-    public void LaguerreTransformationYuliaFuncTest()
-    {
-        var laguerre = fixture.Laguerres[5];
-        double expected = 0.77927;
+        var laguerre = fixture.Laguerres[laguerreIndex];
         double[] result = laguerre.LaguerreTransformationValue;
         Assert.Equal(expected, result[0], 5);
     }
@@ -229,9 +198,28 @@ public class ServiceTests : IClassFixture<AllData>
         fixture = allData;
     }
 
-    [Fact]
-    public void IntegrationTest()
+    [Theory]
+    [InlineData(0, 2, 2.66667)]
+    [InlineData(1, 3, 8.66667)]
+    [InlineData(-1, 1, 0.66567)]
+    public void IntegrationTest_VariousFunctions(double a, double b, double expected)
     {
-        Assert.Equal(2.66667, Service.Integrate((x) => Math.Pow(x, 2), 0, 2), 5);
+        Assert.Equal(expected, Service.Integrate((x) => Math.Pow(x, 2), a, b), 5);
+    }
+
+    [Theory]
+    [InlineData(0, 2, Math.PI / 2)]
+    [InlineData(1, 4, 1.19395)]
+    public void IntegrationTest_SinFunction(double a, double b, double expected)
+    {
+        Assert.Equal(expected, Service.Integrate(Math.Sin, a, b), 5);
+    }
+
+    [Theory]
+    [InlineData(0, 2, 16.0 / 3)] // 2x^2
+    [InlineData(-1, 1, 1.33133)] // x^2 / 3
+    public void IntegrationTest_PolynomialFunctions(double a, double b, double expected)
+    {
+        Assert.Equal(expected, Service.Integrate((x) => 2 * Math.Pow(x, 2), a, b), 5);
     }
 }
