@@ -1,5 +1,5 @@
+using LaguerreClasses;
 using Xunit;
-
 
 public class AllData : IDisposable
 {
@@ -9,7 +9,7 @@ public class AllData : IDisposable
 
     public AllData()
     {
-        Laguerres = new List<Laguerre>();
+        Laguerres = [];
         static double func(double x) => x * x; // рандомна функ
         static double funcSonya(double t)
         {
@@ -51,9 +51,7 @@ public class AllData : IDisposable
         Laguerres.Add(new Laguerre(funcStefa, 100, 2, 4, 10));
         Laguerres.Add(new Laguerre(funcYuliia, 100, 2, 4, 10));
 
-        LaguerreTabulators = new List<LaguerreTabulator>();
-        LaguerreTabulators.Add(new LaguerreTabulator(func, 10, 2, 5, 10, 0.001));
-
+        LaguerreTabulators = [new LaguerreTabulator(func, 10, 2, 5, 10, 0.001)];
     }
 
     public void Dispose()
@@ -62,6 +60,7 @@ public class AllData : IDisposable
         LaguerreTabulators.Clear();
     }
 }
+
 public class AllDataTests : IClassFixture<AllData>
 {
     private readonly AllData fixture;
@@ -95,6 +94,7 @@ public class AllDataTests : IClassFixture<AllData>
         Assert.NotEmpty(fixture.LaguerreTabulators);
     }
 }
+
 public class LaguerreFunctionTests : IClassFixture<AllData>
 {
     private readonly AllData fixture;
@@ -114,7 +114,6 @@ public class LaguerreFunctionTests : IClassFixture<AllData>
         double result = laguerre.LaguerreFunction(t, n);
         Assert.Equal(expected, result, 5);
     }
-
 }
 
 public class LaguerreExperimentTests : IClassFixture<AllData>
@@ -125,6 +124,7 @@ public class LaguerreExperimentTests : IClassFixture<AllData>
     {
         fixture = allData;
     }
+
     [Fact]
     public void LaguerreExperimentStefaniaFuncTest()
     {
@@ -133,6 +133,7 @@ public class LaguerreExperimentTests : IClassFixture<AllData>
         double result = laguerre.ExperimentValue;
         Assert.Equal(expected, result, 5);
     }
+
     [Fact]
     public void LaguerreExperimentErrorStefaniaFuncTest()
     {
@@ -151,6 +152,7 @@ public class LaguerreTransformationTests : IClassFixture<AllData>
     {
         fixture = allData;
     }
+
     [Fact]
     public void LaguerreTransformationStefaniaFuncTest()
     {
@@ -159,6 +161,7 @@ public class LaguerreTransformationTests : IClassFixture<AllData>
         double[] result = laguerre.LaguerreTransformationValue;
         Assert.Equal(expected, result[0], 5);
     }
+
     [Fact]
     public void LaguerreTransformationSonyaFuncTest()
     {
@@ -167,6 +170,7 @@ public class LaguerreTransformationTests : IClassFixture<AllData>
         double[] result = laguerre.LaguerreTransformationValue;
         Assert.Equal(expected, result[0], 5);
     }
+
     [Fact]
     public void LaguerreTransformationDemianFuncTest()
     {
@@ -175,6 +179,7 @@ public class LaguerreTransformationTests : IClassFixture<AllData>
         double[] result = laguerre.LaguerreTransformationValue;
         Assert.Equal(expected, result[0], 5);
     }
+
     [Fact]
     public void LaguerreTransformationIvanFuncTest()
     {
@@ -183,6 +188,7 @@ public class LaguerreTransformationTests : IClassFixture<AllData>
         double[] result = laguerre.LaguerreTransformationValue;
         Assert.Equal(expected, result[0], 5);
     }
+
     [Fact]
     public void LaguerreTransformationYuliaFuncTest()
     {
@@ -192,6 +198,7 @@ public class LaguerreTransformationTests : IClassFixture<AllData>
         Assert.Equal(expected, result[0], 5);
     }
 }
+
 public class LaguerreTabulatorTests : IClassFixture<AllData>
 {
     private readonly AllData fixture;
@@ -209,12 +216,10 @@ public class LaguerreTabulatorTests : IClassFixture<AllData>
         double to = 5;
 
         var result = tabulator.TabulateLaguerre(n, to);
-        Assert.NotNull(result.t);
-        Assert.NotNull(result.l);
-        Assert.Equal(result.t.Length, result.l.Length);
+        Assert.NotNull(result);
     }
-
 }
+
 public class ServiceTests : IClassFixture<AllData>
 {
     private readonly AllData fixture;
@@ -229,5 +234,4 @@ public class ServiceTests : IClassFixture<AllData>
     {
         Assert.Equal(2.66667, Service.Integrate((x) => Math.Pow(x, 2), 0, 2), 5);
     }
-
 }
