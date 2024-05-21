@@ -216,8 +216,8 @@ public class ServiceTests : IClassFixture<AllData>
     }
 
     [Theory]
-    [InlineData(0, 2, 16.0 / 3)] // 2x^2
-    [InlineData(-1, 1, 1.33133)] // x^2 / 3
+    [InlineData(0, 2, 16.0 / 3)]
+    [InlineData(-1, 1, 1.33133)]
     public void IntegrationTest_PolynomialFunctions(double a, double b, double expected)
     {
         Assert.Equal(expected, Service.Integrate((x) => 2 * Math.Pow(x, 2), a, b), 5);

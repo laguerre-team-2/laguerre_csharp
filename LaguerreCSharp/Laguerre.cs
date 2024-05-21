@@ -253,7 +253,7 @@ public class LaguerreTabulator : Laguerre
         int beta,
         int sigma,
         int N,
-        double epsilon
+        double epsilon = 1e-3
     )
         : base(func, T, beta, sigma, N, epsilon)
     {

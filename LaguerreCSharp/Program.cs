@@ -1,11 +1,55 @@
 ﻿using LaguerreClasses;
 
+static double funcSonya(double t)
+{
+    if (t != 0)
+        return Math.Sin(Math.PI / 3) - Math.Atan(t + t / 2) / t;
+    else
+        return 0;
+}
+
+static double funcDemian(double t)
+{
+    return 2 * (Math.PI / 2 - Math.Atan(t + Math.PI / 6));
+}
+
+static double funcIvan(double t)
+{
+    if (t >= 0 && t <= 2 * Math.PI)
+        return Math.PI / 3 - Math.Sin(t + 3 * Math.PI / 2);
+    else
+        return 0;
+}
+
+static double funcStefa(double t)
+{
+    if (t >= 0 && t <= 2 * Math.PI)
+        return -1d / 200d * Math.Sin(t) * Math.Pow(Math.E, t);
+    else
+        return 0;
+}
+
+static double funcYuliia(double t)
+{
+    return Math.Cos(t) / Math.Pow(t, t);
+}
+
+double T = 100;
+int beta = 2;
+int sigma = 4;
+int N = 12;
+List<(string, LaguerreTabulator)> LaguerreInstances =
+[
+    new("funcSonya", new LaguerreTabulator(funcSonya, T, beta, sigma, N)),
+    new("funcDemian", new LaguerreTabulator(funcDemian, T, beta, sigma, N)),
+    new("funcIvan", new LaguerreTabulator(funcIvan, T, beta, sigma, N)),
+    new("funcStefa", new LaguerreTabulator(funcStefa, T, beta, sigma, N)),
+    new("funcYuliia", new LaguerreTabulator(funcYuliia, T, beta, sigma, N)),
+];
+
 using (StreamWriter writetext = new("data/GaussReverseTransformationData.csv"))
 {
     int a = 10;
-    int N = 20;
-    int beta = 2;
-    int sigma = 4;
     List<(string, Laguerre)> laguerres =
     [
         (
@@ -84,28 +128,60 @@ using (StreamWriter writetext = new("data/GaussReverseTransformationData.csv"))
     }
 }
 
-static double func(double x) => 1 / (x + 1);
-LaguerreTabulator Instance = new(func, 100, 2, 4, 10, 0.001);
-var tabulatedExperimentData = Instance.TabulateExperiment();
 using (StreamWriter writetext = new("data/tabulatedExperiment.csv"))
 {
-    writetext.WriteLine("t,n,L(t)");
-    foreach (var value in tabulatedExperimentData)
-        writetext.WriteLine($"{value.Item1},{value.Item2},{value.Item3}");
+    writetext.Write("n");
+    foreach (var item in LaguerreInstances)
+    {
+        writetext.Write($",t_{item.Item1},L_(t)_{item.Item1}");
+    }
+    writetext.WriteLine();
+
+    List<List<(double, int, double)>> tabulatedExperiments = [];
+    foreach (var laguerre in LaguerreInstances)
+    {
+        tabulatedExperiments.Add(laguerre.Item2.TabulateExperiment());
+    }
+
+    for (int i = 0; i <= N; i++)
+    {
+        writetext.Write($"{i}");
+        foreach (var experiment in tabulatedExperiments)
+        {
+            writetext.Write($",{experiment[i].Item2},{experiment[i].Item3}");
+        }
+        writetext.WriteLine();
+    }
 }
 
-var tabulateLaguerreTransformation = Instance.TabulateLaguerreTransformation();
 using (StreamWriter writetext = new("data/tabulateLaguerreTransformation.csv"))
 {
-    writetext.WriteLine("x,t");
-    foreach (var value in tabulateLaguerreTransformation)
-        writetext.WriteLine($"{value.Item1},{value.Item2}");
+    writetext.Write("x");
+    foreach (var laguerre in LaguerreInstances)
+    {
+        writetext.Write($",t_{laguerre.Item1}");
+    }
+    writetext.WriteLine();
+    List<List<(int, double)>> tabulateLaguerreTransformations = [];
+    foreach (var laguerre in LaguerreInstances)
+    {
+        tabulateLaguerreTransformations.Add(laguerre.Item2.TabulateLaguerreTransformation());
+    }
+    for (int i = 0; i <= N; i++)
+    {
+        writetext.Write($"{i}");
+        foreach (var transformation in tabulateLaguerreTransformations)
+        {
+            writetext.Write($",{transformation[i].Item2}");
+        }
+        writetext.WriteLine();
+    }
 }
 
 using (StreamWriter writetext = new("data/lauguerreFuncData.csv"))
 {
-    int N = 20;
     int a = 3;
+    LaguerreTabulator Instance = new((x) => 1 / (x + 1), 100, 2, 4, 10, 0.001);
     writetext.Write("x");
     for (int i = 0; i < N; i++)
     {
@@ -125,50 +201,9 @@ using (StreamWriter writetext = new("data/lauguerreFuncData.csv"))
 
 using (StreamWriter writetext = new("data/reverseTransformationData.csv"))
 {
-    static double funcSonya(double t)
-    {
-        if (t != 0)
-            return Math.Sin(Math.PI / 3) - Math.Atan(t + t / 2) / t;
-        else
-            return 0;
-    }
-
-    static double funcDemian(double t)
-    {
-        return 2 * (Math.PI / 2 - Math.Atan(t + Math.PI / 6));
-    }
-
-    static double funcIvan(double t)
-    {
-        if (t >= 0 && t <= 2 * Math.PI)
-            return Math.PI / 3 - Math.Sin(t + 3 * Math.PI / 2);
-        else
-            return 0;
-    }
-
-    static double funcStefa(double t)
-    {
-        if (t >= 0 && t <= 2 * Math.PI)
-            return -1d / 200d * Math.Sin(t) * Math.Pow(Math.E, t);
-        else
-            return 0;
-    }
-
-    static double funcYuliia(double t)
-    {
-        return Math.Cos(t) / Math.Pow(t, t);
-    }
-    List<(string, Laguerre)> laguerres =
-    [
-        new("funcSonya", new Laguerre(funcSonya, 100, 2, 4, 10)),
-        new("funcDemian", new Laguerre(funcDemian, 100, 2, 4, 10)),
-        new("funcIvan", new Laguerre(funcIvan, 100, 2, 4, 10)),
-        new("funcStefa", new Laguerre(funcStefa, 100, 2, 4, 10)),
-        new("funcYuliia", new Laguerre(funcYuliia, 100, 2, 4, 10)),
-    ];
     int a = 6;
     writetext.Write("x");
-    foreach (var item in laguerres)
+    foreach (var item in LaguerreInstances)
     {
         writetext.Write($",{item.Item1},{item.Item1}_transformed");
     }
@@ -177,7 +212,7 @@ using (StreamWriter writetext = new("data/reverseTransformationData.csv"))
     foreach (double x in Service.GenerateLinspace(1, a, 100 * (a - 1)))
     {
         writetext.Write($"{x}");
-        foreach (var laguerre in laguerres)
+        foreach (var laguerre in LaguerreInstances)
         {
             writetext.Write(
                 $",{laguerre.Item2.Func(x)},{laguerre.Item2.ReverseLaguerreTransformation(x)}"
